@@ -1,0 +1,17 @@
+{
+    "dockerFile": "Dockerfile",
+    "name": "cronkit-dev-container",
+    "settings": {
+        "editor.fontSize": 14,
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "runArgs": [
+        "--cap-add=ALL",
+       // "--network=mizzle"
+    ],
+    "extensions": [
+        "ms-vscode.cpptools",
+        "austin.code-gnu-global"
+    ]
+    //    "postAttachCommand": "rabbitmq-server -detached && sleep 3s && rabbitmq-plugins enable rabbitmq_management"
+}

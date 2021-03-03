@@ -1,0 +1,26 @@
+{
+    "C_Cpp.default.includePath": [
+        "/usr/local/include",
+        "/usr/local/include/php/main",
+        "/usr/local/include/php",
+        "/usr/local/include/php/Zend",
+        "/usr/local/include/php/TSRM"
+    ],
+    "files.associations": {
+        "php.h": "c",
+        "config.h": "c",
+        "cronkit_heap.h": "c",
+        "cronkit_daemonize.h": "c",
+        "php_cronkit.h": "c",
+        "cronkit_channel.h": "c",
+        "cronkit_fd.h": "c",
+        "cronkit_joblet.h": "c",
+        "cronkit_php_application.h": "c",
+        "ccronexpr.h": "c",
+        "typeinfo": "c",
+        "cronkit_process.h": "c",
+        "limits": "c",
+        "*.tcc": "c",
+        "type_traits": "c"
+    }
+}

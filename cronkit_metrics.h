@@ -1,0 +1,4 @@
+#ifndef CRONKIT_METRICS_H
+#define CRONKIT_METRICS_H
+
+#endif

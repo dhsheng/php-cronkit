@@ -1,0 +1,1 @@
+phpize --clean && phpize . &&  ./configure && make && make install && make distclean
