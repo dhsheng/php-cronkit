@@ -1,0 +1,6 @@
+[submodule "ccronexpr"]
+	path = ccronexpr
+	url = https://github.com/staticlibs/ccronexpr
+[submodule "prometheus-client-c"]
+	path = prometheus-client-c
+	url = https://github.com/digitalocean/prometheus-client-c.git
