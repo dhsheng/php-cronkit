@@ -1,27 +1,29 @@
-#ifndef CRONKIT_EVENT_H
-#define CRONKIT_EVENT_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
-#define CRONKIT_EVENT_NONE 0
-#define CRONKIT_EVENT_READ 1
-#define CRONKIT_EVENT_WRITE 2
+#include "cronkit_event_loop.h"
 
-struct cronkit_event_loop_t;
+struct cronkit_event_loop_t *event_loop = NULL;
 
-typedef void cronkit_event_handler(struct cronkit_event_loop_t *event_loop, int fd, void *data, int mask);
+int say_hello(struct cronkit_event_loop_t *event_loop) {
+    printf("say hello %ld\n", time(NULL));
+}
 
-struct cronkit_event_t {
-    int fd;
-    int mask;
-    cronkit_event_handler *read;
-    cronkit_event_handler *write;
-};
+int main() {
+    event_loop = cronkit_event_loop_init(128);
+    if (event_loop == NULL) {
+        printf("error\n");
+        exit(-1);
+    }
+    event_loop->running = 1;
 
+    struct cronkit_timer_event_t te;
+    te.handler = &say_hello;
+    te.next = NULL;
+    event_loop->timer_event = &te;
 
-int cronkit_event_fire(struct cronkit_event_t *event);
-
-int cronkit_event_loop_wait(int timeout);
-int cronkit_event_loop_add(struct cronkit_event_loop_t *event_loop, int fd, int mask);
-int cronkit_event_loop_del(struct cronkit_event_loop_t *event_loop, int fd, int mask);
-int cronkit_event_loop_init(int maxfd);
-
-#endif
+    cronkit_event_loop_main(event_loop);
+    return 0;
+}

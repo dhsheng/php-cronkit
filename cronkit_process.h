@@ -11,7 +11,6 @@ struct cronkit_process_t {
     pid_t pid;
     time_t start_time;
     int channel[2];
-    int is_parent;
     int solt;
 };
 

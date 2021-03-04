@@ -21,6 +21,8 @@
         "cronkit_process.h": "c",
         "limits": "c",
         "*.tcc": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "time.h": "c",
+        "poll.h": "c"
     }
 }
