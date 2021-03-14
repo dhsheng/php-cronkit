@@ -10,6 +10,7 @@
 
 #include "cronkit_joblet.h"
 #include "cronkit_php_application.h"
+#include "cronkit_main.h"
 
 
 zend_class_entry *cronkit_application_ce;
@@ -48,10 +49,10 @@ static struct cronkit_joblet_t *parse_cronkit_joblet_internal(zval *s) {
     annotation_parse(ANNOTATION_PATTERN_NAME, doc, ANNOTATION_NAME, joblet_name);
     if (joblet_name != NULL) {
         char *sn = ZSTR_VAL(Z_STR_P(joblet_name));
-        strncpy(internal_joblet->name, sn, strlen(sn)+1);
+        strcpy(internal_joblet->name, sn);
     } else {
         char *sn = ZSTR_VAL(class_name);
-        strncpy(internal_joblet->name, sn, strlen(sn)+1);
+        strcpy(internal_joblet->name, sn);
     }
 
     annotation_parse(ANNOTATION_PATTERN_CRON, doc, ANNOTATION_CRON, joblet_cron);
@@ -66,7 +67,7 @@ static struct cronkit_joblet_t *parse_cronkit_joblet_internal(zval *s) {
         }
         internal_joblet->expr[i] = '\0';
     }   
-    strncpy(internal_joblet->handler_class, ZSTR_VAL(class_name), ZSTR_LEN(class_name));
+    strcpy(internal_joblet->handler_class, ZSTR_VAL(class_name));
     return internal_joblet;
 }
 
@@ -121,22 +122,7 @@ PHP_METHOD(cronkit_application, start)
         cronkit_heap_put(&cronkit_joblet_heap, entry);
         joblet = joblet->next;
     }
-
-    /*
-    for(;;) {
-        cronkit_joblet_entry_t *joblet_entry = cronkit_heap_pop(&cronkit_joblet_heap);
-        if(joblet_entry == NULL) {
-            break;
-        }
-        struct tm *tm = localtime(&joblet_entry->next_start);
-        char ds[32];
-        strftime(ds, 31, "%Y-%m-%d %H:%M:%S", tm);
-        printf("cron: %s, name: %s, ps: %ld, next: %s\n", joblet_entry->joblet.expr,
-        joblet_entry->joblet.name, joblet_entry->prev_start, ds);
-    }    
-    */
-    cronkit_joblet_list_cleanup(&cronkit_joblet_list);
-    cronkit_joblet_heap_cleanup(&cronkit_joblet_heap);
+    cronkit_real_main(0, NULL);
 }
 
 
