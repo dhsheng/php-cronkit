@@ -77,9 +77,16 @@ if test "$PHP_CRONKIT" != "no"; then
   dnl
   dnl PHP_SUBST(CRONKIT_SHARED_LIBADD)
   
-  PHP_NEW_EXTENSION(cronkit, cronkit.c \
+  #    
+  PHP_NEW_EXTENSION(cronkit, \
+    ccronexpr/ccronexpr.c \ 
+    cronkit.c \
     cronkit_php_application.c \
-    cronkit_joblet.c \
-    ccronexpr/ccronexpr.c \
+    cronkit_channel.c \
+    cronkit_worker_process.c \
+    cronkit_signal.c \
+    cronkit_event_loop.c \
+    cronkit_joblet.c \  
+    cronkit_main.c \
     cronkit_heap.c , $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
 fi
