@@ -6,6 +6,9 @@ acinclude.m4
 aclocal.m4
 autom4te.cache
 build
+cronkit.php
+main.c
+draft.md
 config.guess
 config.h
 config.h.in
