@@ -2,38 +2,38 @@
 use Cronkit\Application;
 
 /**
- * @name hellosada
- * @cron 0 * *  * * * 
+ * @name test
+ * @cron 0 0 * * * * 
  */
-class Foo {}
+class Foo {
+    public function execute() {
+        echo "foo\n";
+    }
+}
 
 /**
- * @name baraa
- * @cron *\/7 * * * * * 
+ * @name test
+ * @cron * * * * * * 
  */
-class Bar {}
+class Bar {
+    public function execute() {
+        echo "this is bar\n";
+    }
+}
 
 /**
- * @cron *\/5 * * * * * 
+ * @name testv2
+ * @cron * * * * * * 
  */
-class FooBar {}
+class FooBar {
+    public function execute() {
+        
+        echo "foo.bar" . (10 + 20) . "----\n";
+    }
+}
 
 $app = new Application();
 $app->register(Foo::class);
 $app->register(Bar::class);
 $app->register(FooBar::class);
 $app->start();
-
-$a = <<<eof
-/**
- * @name foo.bar.dfadfadsfadsfadsafdsad
- * @cron *\/5 * * * * * 
- */
-eof;
-
-#/@name\\s+(?P<name>[^\\s]+)/
-
-$preg = '/@cron\\s+(?P<cron>[^\r\n]+)/';
-$result = NULL;
-preg_match($preg, $a, $result);
-print_r($result);
