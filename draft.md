@@ -1,1 +1,0 @@
-gcc cronkit_channel.c cronkit_worker_process.c cronkit_signal.c main2.c cronkit_event_loop.c cronkit_joblet.c cronkit_heap.c ccronexpr/ccronexpr.c
