@@ -1,5 +1,5 @@
-#ifndef CRONKIT_EVENT_H
-#define CRONKIT_EVENT_H
+#ifndef CRONKIT_EVENT_LOOP_H
+#define CRONKIT_EVENT_LOOP_H
 
 #define CRONKIT_EVENT_NONE 0
 #define CRONKIT_EVENT_READ 1
@@ -47,12 +47,15 @@ struct cronkit_event_loop_t {
 
 struct cronkit_event_loop_dialect_poll_t {
     int npfds;
+    int next_free_solt;
     struct pollfd *pfds;
 };
 
 int cronkit_event_loop_wait(struct cronkit_event_loop_t *event_loop, long timeout);
 int cronkit_event_loop_main(struct cronkit_event_loop_t *event_loop);
-int cronkit_event_loop_add(struct cronkit_event_loop_t *event_loop, int fd, int mask, cronkit_event_handler *handler);
+int cronkit_event_loop_add(struct cronkit_event_loop_t *event_loop, int fd, int mask, 
+                            cronkit_event_handler *handler);
 int cronkit_event_loop_del(struct cronkit_event_loop_t *event_loop, int fd, int mask);
 struct cronkit_event_loop_t *cronkit_event_loop_init(int max_fd);
+
 #endif

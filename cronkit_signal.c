@@ -1,10 +1,14 @@
 #include <signal.h>
 #include <fcntl.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <sys/socket.h>
 
 #include "cronkit_signal.h"
+#include "zend_signal.h"
+
 
 static int sig_fd[2];
 
@@ -78,7 +82,9 @@ int cronkit_signal_master_init()
 }
 
 static void worker_sig_handler(int sn) {
-
+    if(sn == SIGTERM) {
+        exit(0);
+    }
 }
 
 
@@ -105,6 +111,9 @@ int cronkit_signal_worker_init()
 	    0 > sigaction(SIGQUIT,  &act,      0)) { 
             return -1;
         }    
+    
+    zend_signal_init();
+
     return 0;        
 }
 

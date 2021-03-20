@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 #include "cronkit_channel.h"
 #include "cronkit_heap.h"
 #include "cronkit_joblet.h"
+
 
 
 struct cronkit_heap_t cronkit_joblet_heap;
@@ -12,8 +14,8 @@ struct cronkit_joblet_linked_list_t cronkit_joblet_list;
 
 int cronkit_joblet_entry_cmp(const void *a, const void *b) {
     cronkit_joblet_entry_t *aa, *bb;
-    aa = cronkit_joblet_entry_ptr(a);
-    bb = cronkit_joblet_entry_ptr(b);
+    aa = cronkit_joblet_ptr_cast(a);
+    bb = cronkit_joblet_ptr_cast(b);
     return aa->next_start > bb->next_start ? 1 : 0;
 }
 
@@ -45,6 +47,11 @@ void cronkit_joblet_linked_list_add(
         list->head = joblet;
     }
     list->size++;
+}
+
+void cronkit_joblet_entry_update(cronkit_joblet_entry_t *entry, time_t time) {
+    entry->prev_start = entry->next_start;
+    entry->next_start = cron_next(&entry->cron_expr, time);
 }
 
 cronkit_joblet_entry_t *cronkit_joblet_entry_build(struct cronkit_joblet_t *joblet) {
@@ -83,7 +90,6 @@ void cronkit_joblet_list_cleanup(struct cronkit_joblet_linked_list_t *list) {
         free(tmp);
     }
 }
-
 
 cronkit_joblet_entry_t *cronkit_joblet_entry_alloc() {
     cronkit_joblet_entry_t  *entry;

@@ -12,6 +12,7 @@ struct cronkit_worker_process_t {
     time_t start_time;
     int channel[2];
     int solt;
+    int max_executed;
 };
 
 int cronkit_worker_process_channel_init(struct cronkit_worker_process_t *process);

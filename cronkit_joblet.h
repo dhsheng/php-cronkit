@@ -4,9 +4,10 @@
 #include <time.h>
 
 #include "cronkit_heap.h"
+#include "cronkit_event_loop.h"
 #include "ccronexpr/ccronexpr.h"
 
-#define cronkit_joblet_entry_ptr(v)  ((cronkit_joblet_entry_t *)(v));
+#define cronkit_joblet_ptr_cast(v)  ((cronkit_joblet_entry_t *)(v));
 
 #define cronkit_joblet_linked_list_init(list) do { \
     (list)->head = NULL; \
@@ -40,16 +41,15 @@ typedef struct {
     time_t prev_start;
 } cronkit_joblet_entry_t;
 
+void cronkit_joblet_entry_update(cronkit_joblet_entry_t *entry, time_t time);
 cronkit_joblet_entry_t *cronkit_joblet_entry_alloc();
 cronkit_joblet_entry_t *cronkit_joblet_entry_build(struct cronkit_joblet_t *joblet);
 
 int cronkit_joblet_list_init();
 int cronkit_joblet_heap_init(int cap);
 int cronkit_joblet_heap_cleanup(struct cronkit_heap_t *heap);
-// for scheduler
-extern struct cronkit_heap_t cronkit_joblet_heap;
 
-// in internal use
+extern struct cronkit_heap_t cronkit_joblet_heap;
 extern struct cronkit_joblet_linked_list_t cronkit_joblet_list;
 
 #endif

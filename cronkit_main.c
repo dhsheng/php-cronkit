@@ -108,7 +108,6 @@ int start_joblet_scheduler(struct cronkit_event_loop_t *elv) {
          */
         for(i=0; i<2; i++) {
             write(cronkit_worker_processes[i]->channel[1], entry->joblet.handler_class, strlen(entry->joblet.handler_class)+1);
-            printf("-%s-\n", entry->joblet.handler_class);
         }
         cronkit_joblet_entry_update(entry, now);
         cronkit_heap_put(heap, entry);

@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "cronkit_event_loop.h"
 
@@ -15,6 +16,7 @@ static int cronkit_event_loop_dialect_poll_init(struct cronkit_event_loop_t *eve
         return -1;
     }
     dialect->npfds = 0;
+    dialect->next_free_solt = 0;
     dialect->pfds = malloc(sizeof(struct pollfd) * event_loop->max_fd);
     memset(dialect->pfds, 0, sizeof(struct pollfd) * event_loop->max_fd);
     if(dialect->pfds == NULL) {
@@ -53,17 +55,14 @@ static int cronkit_event_loop_dialect_poll_add(struct cronkit_event_loop_t *even
     }
     struct cronkit_event_loop_dialect_poll_t *dialect;
     dialect = (struct cronkit_event_loop_dialect_poll_t *)event_loop->dialect;
-    
-    if (dialect->npfds < fd) {
-        dialect->npfds = fd;
-    }
-
-    dialect->pfds[fd].fd = fd;
+    int solt = dialect->next_free_solt++;
+    dialect->pfds[solt].fd = fd;
+    dialect->npfds++;
     if (mask & CRONKIT_EVENT_READ) {
-        dialect->pfds[fd].events |= POLLIN;
+        dialect->pfds[solt].events |= POLLIN;
     }
     if (mask & CRONKIT_EVENT_WRITE) {
-        dialect->pfds[fd].events |= POLLOUT;
+        dialect->pfds[solt].events |= POLLOUT;
     }
     return 0;
 }
@@ -77,16 +76,23 @@ static int cronkit_event_loop_dialect_poll_del(struct cronkit_event_loop_t *even
     struct cronkit_event_loop_dialect_poll_t *dialect;
     dialect = (struct cronkit_event_loop_dialect_poll_t *)event_loop->dialect;
     
-    if (mask & CRONKIT_EVENT_READ) {
-        dialect->pfds[fd].events &= (~POLLIN);
-    }
-    if (mask & CRONKIT_EVENT_WRITE) {
-        dialect->pfds[fd].events &= (~POLLOUT);
-    }
-    if (dialect->pfds[fd].events == 0) {
-        dialect->pfds[fd].events = 0;
-        dialect->pfds[fd].fd = -1;
-        dialect->pfds[fd].revents = 0;
+    int i;
+    for(i=0; i<dialect->npfds; i++) {
+        if (dialect->pfds[i].fd == fd) {
+            if (mask & CRONKIT_EVENT_READ) {
+                dialect->pfds[i].events &= (~POLLIN);
+            }
+            if (mask & CRONKIT_EVENT_WRITE) {
+                 dialect->pfds[i].events &= (~POLLOUT);
+            }
+            if (dialect->pfds[i].events == 0) {
+                dialect->pfds[i].events = 0;
+                dialect->pfds[i].fd = -1;
+                dialect->pfds[i].revents = 0;
+                dialect->next_free_solt = i;
+            }
+            break;
+        }
     }
     return 0;
 }
@@ -98,6 +104,7 @@ static int cronkit_event_loop_dialect_poll_wait(struct cronkit_event_loop_t *eve
     int ret;
     struct cronkit_event_loop_dialect_poll_t  *dialect; 
     dialect = (struct cronkit_event_loop_dialect_poll_t*)event_loop->dialect;
+
     ret = poll(dialect->pfds, dialect->npfds, timeout);
 
     if(ret == -1 && errno != EINTR) {
@@ -129,13 +136,26 @@ int cronkit_event_loop_wait(struct cronkit_event_loop_t *event_loop, long timeou
 int cronkit_event_loop_main(struct cronkit_event_loop_t *event_loop) {
     while(event_loop->running) {
         int ret;
-        ret = cronkit_event_loop_dialect_poll_wait(event_loop, 500);
+        ret = cronkit_event_loop_dialect_poll_wait(event_loop, 1000);
         struct cronkit_timer_event_t *event = event_loop->timer_event;
         while(event) {
             if(event->handler) {
                 event->handler(event_loop);
             }
             event = event->next;
+        }
+        int i;
+        for(i=0; i<ret; i++) {
+            struct cronkit_event_t *event;
+            struct cronkit_event_fired_t *fired; 
+            fired = &event_loop->fired[i];
+            event = &event_loop->events[fired->fd];
+            if (fired->mask & CRONKIT_EVENT_READ && event->read) {
+                event->read(event_loop, fired->fd, NULL, fired->mask);
+            }
+            if (fired->mask & CRONKIT_EVENT_WRITE && event->write) {
+                event->write(event_loop, fired->fd, NULL, fired->mask);
+            }
         }
     }
 }
@@ -187,6 +207,7 @@ struct cronkit_event_loop_t *cronkit_event_loop_init(int max_fd) {
     }
 
     int i;
+    event_loop->timer_event = NULL;
     event_loop->events = malloc(sizeof(struct cronkit_event_t) * max_fd);
     if (event_loop->events == NULL) {
         cronkit_event_loop_dialect_poll_cleanup(event_loop);
