@@ -7,11 +7,9 @@
     },
     "runArgs": [
         "--cap-add=ALL",
-       // "--network=mizzle"
     ],
     "extensions": [
         "ms-vscode.cpptools",
         "austin.code-gnu-global"
     ]
-    //    "postAttachCommand": "rabbitmq-server -detached && sleep 3s && rabbitmq-plugins enable rabbitmq_management"
 }
