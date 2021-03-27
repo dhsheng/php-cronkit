@@ -25,20 +25,7 @@ PHP_INI_BEGIN()
 PHP_INI_END()
 */
 /* }}} */
-PHP_FUNCTION(confirm_cronkit_compiled)
-{
-	char *arg = NULL;
-	size_t arg_len, len;
-	zend_string *strg;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arg, &arg_len) == FAILURE) {
-		return;
-	}
-
-	strg = strpprintf(0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "cronkit", arg);
-
-	RETURN_STR(strg);
-}
 /* }}} */
 
 
@@ -113,7 +100,6 @@ PHP_MINFO_FUNCTION(cronkit)
  * Every user visible function must have an entry in cronkit_functions[].
  */
 const zend_function_entry cronkit_functions[] = {
-	PHP_FE(confirm_cronkit_compiled,	NULL)		/* For testing, remove later. */
 	PHP_FE_END	/* Must be the last line in cronkit_functions[] */
 };
 /* }}} */

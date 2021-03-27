@@ -1,4 +1,3 @@
-#include <poll.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,7 +19,6 @@
 #include "cronkit_main.h"
 
 
-
 #define CRONKIT_MAX_FD 128
 #define CRONKIT_JOB_MESSAGE_SIZE 1024
 
@@ -32,16 +30,13 @@ void handle_job_received(struct cronkit_event_loop_t *event_loop, int fd, void *
         return;
     }
     zend_class_entry *ce = zend_lookup_class(zend_string_init(buf, strlen(buf), 0));
-    printf("ce is %s\n", buf);
     if (ce == NULL) {
         return ;
     }
     
     zval obj;
-    if (SUCCESS == object_init_ex(&obj, ce)) {
-        printf("init c_obj ok %s\n", buf);
-    } else {
-        printf("init c_obj failure\n");
+    if (SUCCESS != object_init_ex(&obj, ce)) {
+        return;
     }
 
     zval retval, fn;
@@ -55,8 +50,7 @@ void handle_job_received(struct cronkit_event_loop_t *event_loop, int fd, void *
     fci.retval = &retval;                                                                                                     
     fci.object = Z_OBJ(obj);                                                                                                
     fci.no_separation = 1;  
-    int code = zend_call_function(&fci, NULL);
-    printf("ret code %d\n", code); 
+    zend_call_function(&fci, NULL);
 }
 
 
@@ -64,16 +58,15 @@ void cronkit_process_exit() {
     int status;
     pid_t pid;
     while ((pid = waitpid(-1, &status, WNOHANG | WUNTRACED)) > 0) { 
-        printf("catch %d\n", pid);
-
+        
         if(WIFEXITED(status)) {
-            printf("exited\n");
+            // @todo
         }
         if(WIFSIGNALED(status)) {
-            printf("signaled %d\n", WTERMSIG(status));
+            // @todo
         }
         if(WIFSTOPPED(status)) {
-            printf("stopeed\n");
+            // @todo
         }
     }
 }
