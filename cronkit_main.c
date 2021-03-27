@@ -20,6 +20,7 @@
 
 
 #define CRONKIT_MAX_FD 128
+#define CRONKIT_MAX_WORKER_PROCESS 32
 #define CRONKIT_JOB_MESSAGE_SIZE 1024
 
 void handle_job_received(struct cronkit_event_loop_t *event_loop, int fd, void *data, int mask) {
@@ -98,8 +99,9 @@ int start_joblet_scheduler(struct cronkit_event_loop_t *elv) {
         entry = cronkit_heap_pop(heap);
         /**
          *  @todo write to fd
+         *  @todo worker_process 
          */
-        for(i=0; i<2; i++) {
+        for(i=0; i<CRONKIT_MAX_WORKER_PROCESS; i++) {
             write(cronkit_worker_processes[i]->channel[1], entry->joblet.handler_class, strlen(entry->joblet.handler_class)+1);
         }
         cronkit_joblet_entry_update(entry, now);
@@ -110,7 +112,8 @@ int start_joblet_scheduler(struct cronkit_event_loop_t *elv) {
 
 void cronkit_exit_cleanup() {
     int i;
-    for(i=0; i<2; i++) {
+    // @todo
+    for(i=0; i<CRONKIT_MAX_WORKER_PROCESS; i++) {
         kill(cronkit_worker_processes[i]->pid, SIGTERM);
     }
     exit(0);
@@ -179,7 +182,8 @@ int cronkit_real_main(int argc, char *argv[]) {
     
     // fork worker process
     pid_t pid;
-    for(i=0; i<2; i++) {
+    // @todo
+    for(i=0; i<CRONKIT_MAX_WORKER_PROCESS; i++) {
         pid = cronkit_worker_process_fork(i);
         if (pid == 0) {
             goto start_worker_process;
