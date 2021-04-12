@@ -171,11 +171,10 @@ int start_worker_process() {
 }
 
 
-int cronkit_real_main(int argc, char *argv[]) {
+int cronkit_real_main(cronkit_config_t config) {
 
     int ret, mfd, i;
     struct cronkit_event_loop_t *elv;
-
 
     // init signal for master
     ret = cronkit_signal_master_init();

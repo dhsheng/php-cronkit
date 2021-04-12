@@ -1,6 +1,8 @@
 #ifndef CRONKIT_MAIN_H
 #define CRONKIT_MAIN_H
 
-int cronkit_real_main(int argc, char *argv[]);
+#include "cronkit_config.h"
+
+int cronkit_real_main(cronkit_config_t config);
 
 #endif

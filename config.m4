@@ -88,5 +88,6 @@ if test "$PHP_CRONKIT" != "no"; then
     cronkit_event_loop.c \
     cronkit_joblet.c \  
     cronkit_main.c \
+    cronkit_config.c \
     cronkit_heap.c , $ext_shared,, -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1)
 fi
