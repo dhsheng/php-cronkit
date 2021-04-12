@@ -17,17 +17,8 @@ class Hello {
     }
 }
 
-/**
- * @name foobar
- */
-class Foobar {
-    public function execute() {
-        echo sprintf("foobar\n");
-    }
-}
 
 $app = new Application();
 $app->register(Hello::class);
-$app->register('*/1 * * * * *', Foobar::class);
 $app->start();
 ```
