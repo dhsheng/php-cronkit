@@ -9,17 +9,23 @@
 #include "ext/spl/spl_exceptions.h"
 
 #include "cronkit_joblet.h"
+#include "cronkit_config.h"
 #include "cronkit_php_application.h"
 #include "cronkit_main.h"
 
 
 zend_class_entry *cronkit_application_ce;
 
+
 ZEND_BEGIN_ARG_INFO_EX(cronkit_application_void_arg, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(cronkit_application_start_arg, 0, 0, 1)
 ZEND_ARG_ARRAY_INFO(0, options, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(cronkit_application_setworkernum_arg, 0, 0, 1)
+ZEND_ARG_TYPE_INFO(0, num, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(cronkit_application_addtasklet_arg, 0, 0, 1)
@@ -99,6 +105,14 @@ PHP_METHOD(cronkit_application, register) {
     );
 }
 
+PHP_METHOD(cronkit_application, setWorkerNum) {
+    
+    zend_long *max_worker_num;
+    ZEND_PARSE_PARAMETERS_START(1, 1)
+    Z_PARAM_LONG(max_worker_num)
+    ZEND_PARSE_PARAMETERS_END();
+    global_cronkit_config.max_worker_num = max_worker_num;
+}
 
 PHP_METHOD(cronkit_application, __construct)
 {
@@ -122,7 +136,7 @@ PHP_METHOD(cronkit_application, start)
         cronkit_heap_put(&cronkit_joblet_heap, entry);
         joblet = joblet->next;
     }
-    cronkit_real_main(0, NULL);
+    cronkit_real_main(global_cronkit_config);
 }
 
 
@@ -130,6 +144,7 @@ static zend_function_entry cronkit_application_methods[] = {
     PHP_ME(cronkit_application, __construct, cronkit_application_void_arg, ZEND_ACC_PUBLIC)
     PHP_ME(cronkit_application, start, cronkit_application_start_arg, ZEND_ACC_PUBLIC)
     PHP_ME(cronkit_application, register, cronkit_application_register_arg, ZEND_ACC_PUBLIC)
+    PHP_ME(cronkit_application, setWorkerNum, cronkit_application_setworkernum_arg, ZEND_ACC_PUBLIC)
     PHP_FE_END
 };
 
